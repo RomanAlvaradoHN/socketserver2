@@ -27,6 +27,7 @@ class Server:
 
                 print("\n\nNueva conexión de {}:{}".format(client_address[0], client_address[1]))
                 print("Participante: {}".format(client_name))
+                print("====================")
 
                 #Añadimos el nuevo participante a la lista
                 self.clients.append({"name": client_name, "socket": client_socket})
@@ -60,7 +61,7 @@ class Server:
         #encuentra quien envia el msj===================
         for client in self.clients:
             if client["socket"] == client_socket:
-                sender_name = client["name"] + ": "
+                sender_name = client["name"] + ": " 
                 break
 
 
@@ -76,18 +77,15 @@ class Server:
             if message.startswith("@"):
                 recipient, message = message.split(":", 1)
                 recipient = recipient[1:]
-                
-
-                print(recipient)
 
                 if recipient == "server": #consola del servidor
                     self.send_message_to_server(sender_name, message)
                 
                 else: #consola de participante específico
-                    self.send_message_to_client(sender_name, recipient, message)
+                    self.send_message_to_client(recipient, (sender_name + message))
             
             else: #consola de todos los participantes
-                self.broadcast(message, client_socket)
+                self.broadcast((sender_name + message), client_socket)
 
         client_socket.close()
         self.clients.remove(client_socket)
@@ -101,7 +99,7 @@ class Server:
 
             
     
-    def send_message_to_client(self, sender_name, recipient, message):
+    def send_message_to_client(self, recipient, message):
         for client in self.clients:
             if client["name"] == recipient:
                 client["socket"].send(message.encode("utf-8"))
